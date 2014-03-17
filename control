@@ -1,0 +1,9 @@
+Package: com.naken.skua
+Name: Skua
+Depends: mobilesubstrate
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Mobile QQ auto-reply bot
+Maintainer: snakeninny
+Author: snakeninny
+Section: Tweaks
