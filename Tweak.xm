@@ -51,34 +51,37 @@ static NSMutableDictionary *dictionary;
 	}
 	else if ([object isKindOfClass:NSClassFromString(@"QQChatCell")] || [object isKindOfClass:NSClassFromString(@"QQChatCellModel")])
 	{
-		NSString *content = [object content];
-		NSString *nick = [object nick];
-
-		if ([content rangeOfString:@"skua"].location != NSNotFound)
+		if (![object isSelf]) // get rid of circle
 		{
-			if ([nick isEqualToString:@"大名狗剩"])
+			NSString *content = [object content];
+			NSString *nick = [object nick];
+
+			if ([content rangeOfString:@"skua"].location != NSNotFound)
 			{
-				NSString *assistantMessage = [[NSString alloc] initWithString:@"好的主人。"];
-				[controller sendSpecialText:assistantMessage];
-				[assistantMessage release];
+				if ([nick isEqualToString:@"大名狗剩"])
+				{
+					NSString *assistantMessage = [[NSString alloc] initWithString:@"好的主人。"];
+					[controller sendSpecialText:assistantMessage];
+					[assistantMessage release];
+				}
+				else
+				{
+					NSString *jokeMessage = [[NSString alloc] initWithFormat:@"@%@ ，叫我干嘛？不理你~", nick];
+					[controller sendSpecialText:jokeMessage];
+					[jokeMessage release];
+				}
 			}
 			else
 			{
-				NSString *jokeMessage = [[NSString alloc] initWithFormat:@"@%@ ，叫我干嘛？不理你~", nick];
-				[controller sendSpecialText:jokeMessage];
-				[jokeMessage release];
-			}
-		}
-		else
-		{
-			for (NSString *message in [dictionary allKeys])
-			{
-				if ([content rangeOfString:message].location != NSNotFound)
+				for (NSString *message in [dictionary allKeys])
 				{
-					NSString *replyMessage = [[NSString alloc] initWithFormat:@"你好@%@ ，%@", nick, [dictionary objectForKey:message]];
-					[controller sendSpecialText:replyMessage];
-					[replyMessage release];
-					break;
+					if ([content rangeOfString:message].location != NSNotFound)
+					{
+						NSString *replyMessage = [[NSString alloc] initWithFormat:@"你好@%@ ，%@", nick, [dictionary objectForKey:message]];
+						[controller sendSpecialText:replyMessage];
+						[replyMessage release];
+						break;
+					}
 				}
 			}
 		}
@@ -98,7 +101,7 @@ static inline void CreateSkuaDatabase(void)
 		NSString *replyMessage = [[NSString alloc] initWithString:@"iOS应用逆向工程Q群小秘书正在为您服务。有技术问题？QQ消息流动太快，留不住有用信息，大家现在可能都在忙，很可能遗漏这个问题。请您整理一下问题的来龙去脉，附带必要的调试信息，去我们的论坛iosre.com发帖，谢谢！"];
 		[dictionary release];
 		dictionary = nil;
-		dictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys:welcomMessage, @"已加入群", replyMessage, @"求解决", replyMessage, @"求解答", replyMessage, @"为什么", replyMessage, @"么？", replyMessage, @"吗？", replyMessage, @"不？", nil]; // object:reply key:message 注意别循环了！
+		dictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys:welcomMessage, @"已加入群", replyMessage, @"求解决", replyMessage, @"求解答", replyMessage, @"为什么", replyMessage, @"么？", replyMessage, @"吗？", replyMessage, @"不？", nil]; // object: reply key: keyword
 		[dictionary writeToFile:filePath atomically:YES];
 		[welcomMessage release];
 		[replyMessage release];
